@@ -35,3 +35,7 @@ The goals of monk:
 - monk-shami: Bootstraps a server, running in a datacenter cluster. Updates server on demand.
 - monk-jushoku: Schudules app/server deployments, handles traffic routing as required.
 - monk: front-end for monk-roshi, monk-shami, monk-jushoku.
+
+## How to contribute
+
+Clone this repository, write some code, create a pull-request.
