@@ -1,0 +1,5 @@
+# Create a stateless dispatcher
+
+global.messaging.dispatcher <- aggregate -> stateless
+	receivedEvent <- event
+        

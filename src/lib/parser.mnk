@@ -1,0 +1,169 @@
+# This part parses a program
+
+compiler.parser.file <- aggregate
+	lines <- collection <- compiler.parser.line
+    readFile <- event (file)
+        guard:
+            if %file.error
+                emit Failure
+            else
+                emit Success
+		calculateIndention (line):
+			return 0
+		mutate:
+			ls = %file.data.split '\n'
+			ls = ls.reverse
+			lastIndention = 0
+			foreach ls as line
+				currentIndention = %calculateIndention ls
+				emit new readLine line, currentIndention =>
+					lines.Add %% ## %% is last id created
+
+compiler.parser.line <- aggregate
+    readLine <- event (line)
+        mutate:
+			# todo: calculate indention
+            tokens = %line.split ' '
+            foreach tokens as token
+                emit new foundToken token
+
+compiler.parser.token <- aggregate
+	leftSide <- container <- compiler.parser.token
+	rightSide <- container <- compiler.parser.token
+	kind <- value
+	value <- value
+	expressionComplete <- value
+	indention <- value
+	
+	foundToken <- event (token)
+		mutate:
+			@indention = %indention
+			# are we a new token
+			if @kind is undefined
+				emit newTokenFound %token
+			else
+				# we are not a new token, so are we done?
+				if not @expressionComplete
+					emit assembling %token
+				else
+					emit isVerifyingSyntax
+	assembling <- event (token)
+		mutate:
+			
+	newTokenFound <- event (token)
+		mutate:
+			@expressionComplete = false
+			switch %token
+				'<':
+					@type = 'operator'
+					@value = '<'
+				'>':
+					@type = 'operator'
+					@value = '>'
+				'=':
+					@type = 'operator'
+					@value = '='
+				'-':
+					@type = 'operator'
+					@value = '-'
+				'+':
+					@type = 'operator'
+					@value = '+'
+				'/':
+					@type = 'operator'
+					@value = '/'
+				'*':
+					@type = 'operator'
+					@value = '*'
+				'->':
+					@type = 'operator'
+					@value = 'concurrent'
+				'=>':
+					@type = 'operator'
+					@value = 'after'
+				'<-':
+					@type = 'operator'
+					@value = 'type'
+				'aggregate':	
+				'value':
+				'event':
+				'container':
+				'undefined':
+				'true':
+				'false':
+				'Success':
+				'Failure':
+				'String':
+				'Int':
+				'Bool':
+					@kind = 'type'
+					@value = %token
+				'assert':
+					@kind = 'assert'
+					@value = 'assert'
+				'new':
+					@kind = 'control'
+					@value = 'new'
+				'while':
+					@kind = 'control'
+					@value = 'while'
+				'is':
+					@kind = 'operator'
+					@value = '=='
+				'switch':
+					@kind = 'control'
+					@value = 'switch'
+				'waitFor':
+					@kind = 'continuation'
+					@value = 'waitFor'
+				'emit':
+					@kind = 'event'
+					@value = 'emit'
+				'if':
+					@kind = 'control'
+					@value = 'if'
+				'not':
+					@kind = 'operator'
+					@value = '!'
+				'else':
+					@kind = 'control'
+					@value = 'else'
+				'canBe':
+					@kind = 'operator'
+					@value = 'canBe'
+				'default':
+					@kind = 'control'
+					@value = 'default'
+				'return':
+					@kind = 'control'
+					@value = 'return'
+				'findAll':
+					@kind = 'container'
+					@value = 'findAll'
+				'fold':
+					@kind = 'container'
+					@value = 'fold'
+				'map':
+					@kind = 'container'
+					@value = 'map'
+				'filter':
+					@kind = 'container'
+					@value = 'filter'
+				'sameAs':
+					@kind = 'control'
+					@value = 'sameAs'
+				'mutate:':
+					@kind = 'mutator'
+					@value = 'mutate'
+				'test:':
+					@kind = 'tester'
+					@value = 'test'
+				'read:':
+					@kind = 'projector'
+					@value = 'read'
+				default:
+					@kind = 'identifier'
+					@value = %token
+					break
+			@relatedTokens.Add %
+			
