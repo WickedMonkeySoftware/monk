@@ -2,12 +2,12 @@
 
 compiler.parser.file <- aggregate
 	lines <- collection <- compiler.parser.line
-    readFile <- event (file)
-        guard:
-            if %file.error
-                emit Failure
-            else
-                emit Success
+	readFile <- event (file)
+		guard:
+			if %file.error
+				emit Failure
+			else
+				emit Success
 		calculateIndention (line):
 			return 0
 		mutate:
@@ -20,12 +20,12 @@ compiler.parser.file <- aggregate
 					lines.Add %% ## %% is last id created
 
 compiler.parser.line <- aggregate
-    readLine <- event (line)
-        mutate:
+	readLine <- event (line)
+		mutate:
 			# todo: calculate indention
-            tokens = %line.split ' '
-            foreach tokens as token
-                emit new foundToken token
+			tokens = %line.split ' '
+			foreach tokens as token
+				emit new foundToken token
 
 compiler.parser.token <- aggregate
 	leftSide <- container <- compiler.parser.token
