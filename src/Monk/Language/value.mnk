@@ -1,0 +1,10 @@
+domain Monk.Language {
+	aggregate value {
+		value v; // value of the value
+		event receiveValue (v) {
+			mutate {
+				@v = %v.message
+			}
+		}
+	}
+}

@@ -1,0 +1,44 @@
+domain Monk.Language {
+	aggregate handler {
+		value eventHandled = false; // bool
+		value guard; // computable
+		container helpers; // computables
+		container mutators; // computables
+		value agg; // aggregate
+		container tests; // computables
+		
+		/* Handle an aggregate accepting an event */
+		event acceptEvent {
+			mutate {
+				try {
+					if (%guarded && @guard) {
+						emit acceptedEvent (%);
+					}
+					else {
+						emit rejectedEvent (%);
+					}
+				}
+				catch {
+					emit rejectedEvent(%);
+				}
+			}
+		}
+		
+		event acceptedEvent (evnt) {
+			mutate {
+				foreach @mutators as mu {
+					mu.mutate (@agg, %evnt, @helpers)
+				}
+				@eventHandled = true;
+			}			
+		}
+		
+		event rejectedEvent (evnt) {
+			mutate {
+				@eventHandled = true; // do not try this event again
+			}
+		}
+		
+		/* End accepting events */
+	}
+}

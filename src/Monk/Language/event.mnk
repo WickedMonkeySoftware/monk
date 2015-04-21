@@ -1,0 +1,10 @@
+domain Monk.Language {
+	aggregate event {
+		value message; // tuple
+		value trigger; // name of the event
+		value destination; // id
+		value source; // aggregate that emitted the event
+		value parameters; // anything extra
+		value guarded; // is the event guarded?
+	}
+}
